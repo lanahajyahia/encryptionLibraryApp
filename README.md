@@ -22,7 +22,26 @@ dependencies {
   implementation 'com.github.lanahajyahia:encryptionLibraryApp:1.00.01'
 }
 ```
+## Usage
+![](assets/CustomToastDemo.gif)
 
+first call:
+```java                    
+  Encryption encryption = null;
+        try {
+            encryption = Encryption.getInstance(getApplicationContext());
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
+```
+To encrypt or decrypt a string call:
+```java    
+
+String string= "hello";
+String encryptedString = encryption.AESEncryptionOrNull(string);
+encryption.AESDecryptionOrNull(encryptedString);
+```
 
 
 
