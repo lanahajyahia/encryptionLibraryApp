@@ -2,8 +2,15 @@ package com.example.encryptionlibrary;
 
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.util.Base64;
+import android.view.View;
+import android.widget.ImageView;
 
 
+import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -24,7 +31,7 @@ public class Encryption {
     private static Encryption instance;
     /**
      * decrypt/encrypt method used by many... (learned in data security course)
-     *  Advanced Encryption Standard (AES)
+     * Advanced Encryption Standard (AES)
      */
     public static final String METHOD = "AES";
 
@@ -44,9 +51,9 @@ public class Encryption {
 
     /**
      * generates a random secure key for decryption
+     *
      * @param context the main activiy in app where use this library
-     *  private constructor, to build the instance of encryption/decryption
-
+     *                private constructor, to build the instance of encryption/decryption
      */
     private Encryption(Context context) throws NoSuchAlgorithmException {
         try {
@@ -62,11 +69,10 @@ public class Encryption {
         keyGenerator.init(256);
         secretKey = keyGenerator.generateKey();
 
-       secretKeySpec = new SecretKeySpec(secretKey.getEncoded(), METHOD);
+        secretKeySpec = new SecretKeySpec(secretKey.getEncoded(), METHOD);
     }
 
     /**
-     *
      * @param context
      * @return encryption instance
      */
@@ -80,10 +86,11 @@ public class Encryption {
 
     /**
      * encryption method using AES
+     *
      * @param contentString - the string we want to encrypt
      * @return - encrypted string
-     * @throws InvalidKeyException - if the specified key specification cannot be used to generate a secret key
-     *@throws BadPaddingException - if the padding of the data does not match the padding scheme
+     * @throws InvalidKeyException       - if the specified key specification cannot be used to generate a secret key
+     * @throws BadPaddingException       - if the padding of the data does not match the padding scheme
      * @throws IllegalBlockSizeException - if the size of the resulting bytes is not a multiple of the cipher block size
      */
     public String AESEncryption(String contentString) {
@@ -113,6 +120,7 @@ public class Encryption {
 
     /**
      * a method that calls AESEncryption and handles exceptions and return null when it occurs
+     *
      * @param contentString -data the String to be encrypted
      * @return method for encrtyption or null if data sent is null
      */
@@ -132,8 +140,8 @@ public class Encryption {
      * the process occurs in a AsyncTask, other advantage is the Callback with separated methods,
      * one for success and other for the exception
      *
-     * @param contentString     the String to be encrypted
-     * @param callback the Callback to handle the results
+     * @param contentString the String to be encrypted
+     * @param callback      the Callback to handle the results
      */
     public void AESEncryptionAsync(String contentString, final Callback callback) {
         if (callback == null) return;
@@ -157,11 +165,12 @@ public class Encryption {
 
     /**
      * decryption method using AES
+     *
      * @param contentString - the string we want to decrypt
      * @return - decrypted (the original) string
-     * @throws InvalidKeyException -if the specified key specification cannot be used to generate a secret key
-     *@throws BadPaddingException   -if the padding of the data does not match the padding scheme
-     * @throws IllegalBlockSizeException  -if the size of the resulting bytes is not a multiple of the cipher block size
+     * @throws InvalidKeyException       -if the specified key specification cannot be used to generate a secret key
+     * @throws BadPaddingException       -if the padding of the data does not match the padding scheme
+     * @throws IllegalBlockSizeException -if the size of the resulting bytes is not a multiple of the cipher block size
      */
     public String AESDecryption(String contentString) throws UnsupportedEncodingException {
 
@@ -188,6 +197,7 @@ public class Encryption {
 
     /**
      * a method that calls AESDecryption and handles exceptions and return null when it occurs
+     *
      * @param contentString -data the String to be decrypted
      * @return method for decryption or null if data sent is null
      */
@@ -207,8 +217,8 @@ public class Encryption {
      * the process occurs in a AsyncTask, other advantage is the Callback with separated methods,
      * one for success and other for the exception
      *
-     * @param contentString     the String to be encrypted
-     * @param callback the Callback to handle the results
+     * @param contentString the String to be encrypted
+     * @param callback      the Callback to handle the results
      */
     public void AESDecryptionAsync(String contentString, final Callback callback) {
         if (callback == null) return;
@@ -250,6 +260,54 @@ public class Encryption {
         void onError(Exception exception);
 
     }
+
+
+    /// IMAGE ENCRYPTION
+
+    /**
+     * this is a ethod that takes an imageview convert it to bitmap and then the bitmap to base64
+     * string and encrypte it- we usually use this to protect and secure images when sending to firebase
+     *
+     * @param imageView
+     * @return encrypted image string
+     */
+    public String ImageViewEncryption(ImageView imageView) {
+        String imgString = "";
+        BitmapDrawable drawable = (BitmapDrawable) imageView.getDrawable();
+        Bitmap bitmap = drawable.getBitmap();
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+
+        imgString = Base64.encodeToString(outputStream.toByteArray(), Base64.DEFAULT);
+
+        return AESEncryptionOrNull(imgString);
+
+    }
+
+
+    /**
+     * this is a method that decrypt an imageview by decryption a string and then turn it into a
+     * bitmap and then the bitmap
+     *
+     * @param imageString
+     * @return decrypted bitmap
+     * @throws IllegalArgumentException
+     */
+    public Bitmap ImageViewDecryption(String imageString) throws IllegalArgumentException {
+
+        String encryptedString = AESDecryptionOrNull(imageString);
+        //turn to bitmap
+        byte[] decodedBytes = Base64.decode(
+                encryptedString.substring(encryptedString.indexOf(",") + 1),
+                Base64.DEFAULT
+        );
+
+        Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+
+        return bitmap;
+    }
+
 
 }
 
