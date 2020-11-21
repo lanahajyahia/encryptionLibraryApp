@@ -43,6 +43,14 @@ String encryptedString = encryption.AESEncryptionOrNull(string);
 encryption.AESDecryptionOrNull(encryptedString);
 ```
 
+To encrypt or decrypt an ImageView call:
+```java    
+
+ImageView image = findViewById(R.id.image);
+String imgString = encryption.ImageViewEncryption(image);
+image.setImageBitmap(encryption.ImageViewDecryption(imgString);
+
+```
 
 
 
