@@ -2,6 +2,9 @@
 
 [![](https://jitpack.io/v/lanahajyahia/encryptionLibraryApp.svg)](https://jitpack.io/#lanahajyahia/encryptionLibraryApp)
 
+An encryption/decryption library for Text and ViewImages.>br>
+A viewImage will be converted to bitmap and bitmap to base64 string and then encrypted as a string<br>
+
 ## Setup
 Step 1. Add it in your root build.gradle at the end of repositories:
 ```
@@ -19,6 +22,8 @@ dependencies {
   implementation 'com.github.lanahajyahia:encryptionLibraryApp:1.00.01'
 }
 ```
+
+
 
 
 
